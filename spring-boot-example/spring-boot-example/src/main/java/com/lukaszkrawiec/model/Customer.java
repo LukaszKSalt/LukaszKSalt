@@ -1,4 +1,4 @@
-package com.lukaszkrawiec;
+package com.lukaszkrawiec.model;
 
 import jakarta.persistence.*;
 
