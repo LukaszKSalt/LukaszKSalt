@@ -2,32 +2,44 @@ package com.lukaszkrawiec;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @SpringBootApplication
 @RestController
+@RequestMapping("api/v1/customers")
 public class Main {
+
+    private final CustomerRepository customerRepository;
+
+    public Main(CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
+    }
+
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
     }
 
-    @GetMapping("/greet")
-    public GreetResponse greet() {
-        GreetResponse response = new GreetResponse(
-                "Hello",
-                List.of("Java", "Javascript", "Kotlin", "Scala"),
-                new Person("Łukasz", 28, 5.43));
-        return response;
+    @GetMapping
+    public List<Customer> getCustomers() {
+
+        return customerRepository.findAll();
     }
 
-    record Person(String name, int age, double availableMoney){
+    record newCustomerRequest(
+            String name,
+            String email,
+            Integer age
+    ) {
+
     }
-    record GreetResponse(
-            String greet,
-            List<String> favProgrammingLanguages,
-            Person person) {
+    @PostMapping
+    public void addCustomer(@RequestBody newCustomerRequest request) {
+        Customer customer = new Customer();
+        customer.setName(request.name);
+        customer.setAge(request.age);
+        customer.setEmail(request.email);
+        customerRepository.save(customer);
     }
 }
