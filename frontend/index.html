@@ -9,12 +9,16 @@
     <script src="functions.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const mainElement = document.querySelector('body');
+            const mainElement = document.querySelector('main');
             getCustomers(mainElement);
         });
     </script>
 </head>
 <body>
-    
+    <input type="text" id="searchInput" onkeyup="search()" 
+    placeholder="Search for names.." title="Type in a name">
+    <main>
+
+    </main>
 </body>
 </html>

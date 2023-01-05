@@ -8,18 +8,30 @@ function getCustomers(element) {
 }
 function createCustomerList(data) {
     const customerList = document.createElement('div');
+    customerList.setAttribute('id', 'myDiv');
     console.log(data);
     for (let i = 0; i < data.length; i++){
-        const customerDiv = document.createElement('div');
+        const customerH1 = document.createElement('h1');
 
-        customerDiv.appendChild(createCustomerHeading(data[i]));
-
-        customerList.appendChild(customerDiv);
+        customerH1.textContent = `${data[i].name} ${data[i].age}`;
+        customerH1.setAttribute('property', data[i].id)
+        customerList.appendChild(customerH1);
     }
     return customerList;
 }
-function createCustomerHeading(customer) {
-    const customerHeading = document.createElement('h1');
-    customerHeading.textContent = `${customer.name} ${customer.age}`;
-    return customerHeading;
+function search() {
+    var input, filter, div, h1, txtValue;
+    input = document.getElementById('searchInput');
+    filter = input.value.toUpperCase();
+    div = document.getElementById('myDiv');
+    h1 = div.getElementsByTagName('h1');
+
+    for(let i = 0; i < h1.length; i++) {
+        txtValue = h1[i].textContent;
+        if(txtValue.toUpperCase().indexOf(filter) > -1) {
+            h1[i].style.display = "";
+        } else {
+            h1[i].style.display = "none";
+        }
+    }
 }
