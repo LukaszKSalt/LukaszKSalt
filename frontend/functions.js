@@ -1,4 +1,6 @@
 function getCustomers(element) {
+    if(document.getElementById('myDiv') != null){
+        document.getElementById('myDiv').remove()}
     fetch('http://localhost:8080/api/v1/customers')
         .then(Response => Response.json())
         .then(data => {
@@ -15,16 +17,27 @@ function createCustomerList(data) {
 
         const updateButton = document.createElement('button');
         updateButton.setAttribute('class', 'updateButton');
-        const buttonText = document.createTextNode("Update customer");
-        updateButton.appendChild(buttonText);
+        const updateButtonText = document.createTextNode("Update customer");
+        updateButton.appendChild(updateButtonText);
         updateButton.setAttribute('property', data[i].id);
         updateButton.onclick = function() {updateCustomer(updateButton.getAttribute('property'))};
+
+        const deleteButton = document.createElement('button');
+        deleteButton.setAttribute('class', 'deleteButton');
+        const deleteButtonText = document.createTextNode("Delete customer");
+        deleteButton.appendChild(deleteButtonText);
+        deleteButton.setAttribute('property', data[i].id);
+        deleteButton.onclick = function() {deleteCustomer(deleteButton.getAttribute('property'))};
         
         customerList.appendChild(updateButton);
+        customerList.appendChild(deleteButton);
         customerH1.textContent = `Name: ${data[i].name} Email: ${data[i].email} Age: ${data[i].age}`;
         customerH1.setAttribute('property', data[i].id)
         customerList.appendChild(customerH1);
     }
+    document.getElementById('customerName').value = "";
+    document.getElementById('customerEmail').value = "";
+    document.getElementById('customerAge').value = "";
     return customerList;
 }
 function search() {
@@ -33,40 +46,38 @@ function search() {
     filter = input.value.toUpperCase();
     div = document.getElementById('myDiv');
     h1 = div.getElementsByTagName('h1');
-    buttons = div.getElementsByTagName('button');
+    updateButtons = div.getElementsByClassName('updateButton');
+    deleteButtons = div.getElementsByClassName('deleteButton');
 
     for(let i = 0; i < h1.length; i++) {
         txtValue = h1[i].textContent;
         if(txtValue.toUpperCase().indexOf(filter) > -1) {
             h1[i].style.display = "";
-            buttons[i].style.display = "";
+            updateButtons[i].style.display = "";
+            deleteButtons[i].style.display = "";
         } else {
             h1[i].style.display = "none";
-            buttons[i].style.display = "none";
+            updateButtons[i].style.display = "none";
+            deleteButtons[i].style.display = "none";
         }
     }
-}
-function reloadCustomer(Customer) {
-    var myDiv = document.getElementById('myDiv');
-    var customers = myDiv.getElementsByTagName('h1');
-    console.log(customers);
-    for(let i = 0; i < customers.length; i++){
-        if(customers[i].getAttribute('property') == Customer.id){
-            customers[i].textContent = "";
-            customers[i].textContent = `Name: ${Customer.name} 
-            Email: ${Customer.email} 
-            Age: ${Customer.age}`
-        }
-    }
-    alert("Customer updated!");
 }
 function updateCustomer(customerID) {
     const Customer = {
         id: customerID,
-        name: document.getElementById('customerName').value,
-        email: document.getElementById('customerEmail').value,
-        age: document.getElementById('customerAge').value
+        name: "",
+        email: "",
+        age: ""
     }
+    if(required(document.getElementById('customerName'))){
+        Customer.name = document.getElementById('customerName').value
+    } else return;
+    if(required(document.getElementById('customerEmail'))){
+        Customer.email = document.getElementById('customerEmail').value
+    } else return;
+    if(required(document.getElementById('customerAge'))){
+        Customer.age = document.getElementById('customerAge').value
+    } else return;
     const putRequest = {
         method: 'PUT',
         headers: {
@@ -74,16 +85,26 @@ function updateCustomer(customerID) {
         },
         body: JSON.stringify(Customer)
     }
-    fetch('http://localhost:8080/api/v1/customers', putRequest);
-    reloadCustomer(Customer);
+    fetch('http://localhost:8080/api/v1/customers', putRequest).then(() => {
+    const mainElement = document.querySelector('main');
+    getCustomers(mainElement);
+    })
 }
-function addCustomer(customerID) {
+function addCustomer() {
     const Customer = {
-        id: customerID,
-        name: document.getElementById('customerName').value,
-        email: document.getElementById('customerEmail').value,
-        age: document.getElementById('customerAge').value
+        name: "",
+        email: "",
+        age: ""
     }
+    if(required(document.getElementById('customerName'))){
+        Customer.name = document.getElementById('customerName').value
+    } else return;
+    if(required(document.getElementById('customerEmail'))){
+        Customer.email = document.getElementById('customerEmail').value
+    } else return;
+    if(required(document.getElementById('customerAge'))){
+        Customer.age = document.getElementById('customerAge').value
+    } else return;
     const postRequest = {
         method: 'POST',
         headers: {
@@ -91,22 +112,24 @@ function addCustomer(customerID) {
         },
         body: JSON.stringify(Customer)
     }
-    fetch('http://localhost:8080/api/v1/customers', postRequest);
-    addNewCustomer(Customer);
+    fetch('http://localhost:8080/api/v1/customers', postRequest).then(() => {
+    const mainElement = document.querySelector('main');
+    getCustomers(mainElement);
+    })
 }
-function addNewCustomer(Customer){
-    var myDiv = document.getElementById('myDiv');
-    const customerH1 = document.createElement('h1');
-
-    const updateButton = document.createElement('button');
-    updateButton.setAttribute('class', 'updateButton');
-    const buttonText = document.createTextNode("Update customer");
-    updateButton.appendChild(buttonText);
-    updateButton.setAttribute('property', data[i].id);
-    updateButton.onclick = function() {updateCustomer(updateButton.getAttribute('property'))};
-    
-    myDiv.appendChild(updateButton);
-    customerH1.textContent = `Name: ${data[i].name} Email: ${data[i].email} Age: ${data[i].age}`;
-    customerH1.setAttribute('property', data[i].id)
-    myDiv.appendChild(customerH1);
+function deleteCustomer(customerID) {
+    const deleteRequest = {
+        method: 'DELETE'
+    }
+    fetch('http://localhost:8080/api/v1/customers/' + customerID, deleteRequest).then(() => {
+    const mainElement = document.querySelector('main');
+    getCustomers(mainElement);
+    })
+}
+function required(inputtx) {
+    if (inputtx.value.length == 0){ 
+         alert("Name, Email or Age fields cannot be empty!");  	
+         return false; 
+    }  	
+    return true; 
 }

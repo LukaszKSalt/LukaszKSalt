@@ -42,6 +42,7 @@ public class CustomersController {
         }));
     }
 
+    @CrossOrigin
     @DeleteMapping("{customerID}")
     public void deleteCustomer(@PathVariable("customerID") Integer id) {
         customerRepository.deleteById(id);
